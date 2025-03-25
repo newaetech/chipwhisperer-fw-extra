@@ -16,7 +16,7 @@
 #define ROUNDS_BEFORE_RESEED 50000
 #define AES_KEY_SIZE 16
 
-static uint32_t AES_KEY_SCH[44];
+static uint8_t AES_KEY_SCH[44];
 static char ltcAesKey[AES_KEY_SIZE];
 static uint32_t maskSeed;
 static uint32_t nbAesBlocks;
