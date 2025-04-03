@@ -105,7 +105,7 @@
 #define  DATA_CACHE_ENABLE            1U
 
 
-#define STM32F205xx
+//#define STM32F205xx
 #include "stm32f2xx.h"
 
 #endif

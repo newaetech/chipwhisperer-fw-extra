@@ -10,8 +10,8 @@
   *          is using in the C source code, usually in main.c. This file contains:
   *            - Configuration section that allows to select:
   *              - The STM32F1xx device used in the target application
-  *              - To use or not the peripheral’s drivers in application code(i.e. 
-  *                code will be based on direct access to peripheral’s registers 
+  *              - To use or not the peripheralï¿½s drivers in application code(i.e. 
+  *                code will be based on direct access to peripheralï¿½s registers 
   *                rather than drivers API), this option is controlled by 
   *                "#define USE_HAL_DRIVER"
   *  
@@ -78,7 +78,7 @@
 #if !defined (STM32F100xB) && !defined (STM32F100xE) && !defined (STM32F101x6) && \
     !defined (STM32F101xB) && !defined (STM32F101xE) && !defined (STM32F101xG) && !defined (STM32F102x6) && !defined (STM32F102xB) && !defined (STM32F103x6) && \
     !defined (STM32F103xB) && !defined (STM32F103xE) && !defined (STM32F103xG) && !defined (STM32F105xC) && !defined (STM32F107xC)
-  /* #define STM32F100xB  */   /*!< STM32F100C4, STM32F100R4, STM32F100C6, STM32F100R6, STM32F100C8, STM32F100R8, STM32F100V8, STM32F100CB, STM32F100RB and STM32F100VB */
+  #define STM32F100xB   /*!< STM32F100C4, STM32F100R4, STM32F100C6, STM32F100R6, STM32F100C8, STM32F100R8, STM32F100V8, STM32F100CB, STM32F100RB and STM32F100VB */
   /* #define STM32F100xE */    /*!< STM32F100RC, STM32F100VC, STM32F100ZC, STM32F100RD, STM32F100VD, STM32F100ZD, STM32F100RE, STM32F100VE and STM32F100ZE */
   /* #define STM32F101x6  */   /*!< STM32F101C4, STM32F101R4, STM32F101T4, STM32F101C6, STM32F101R6 and STM32F101T6 Devices */
   /* #define STM32F101xB  */   /*!< STM32F101C8, STM32F101R8, STM32F101T8, STM32F101V8, STM32F101CB, STM32F101RB, STM32F101TB and STM32F101VB */
