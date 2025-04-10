@@ -12,6 +12,9 @@
 #include "IfxQspi_reg.h"
 #include "IfxStm_reg.h"
 #include "IfxStm_bf.h"
+#if SS_VER == SS_VER_2_1
+#warning "This target operates at 38400bps with SSV2! Set target.baud = 38400"
+#endif
 
 # define BOARD_NAME				"TriBoard-TC233A"
 # define BOARD_TITLE			"TC233A TriBoard"

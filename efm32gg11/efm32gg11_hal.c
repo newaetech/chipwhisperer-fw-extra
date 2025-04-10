@@ -11,6 +11,9 @@
 //make flashing device lock bootloader
 //const uint32_t __attribute__((section (".debug_lock"))) user_lock_word[1] = {0xFFFFFFFD};
 
+#if SS_VER == SS_VER_2_1
+#warning "This target operates at 38400bps with SSV2! Set target.baud = 38400"
+#endif
 void platform_init(void)
 {
     CHIP_Init();

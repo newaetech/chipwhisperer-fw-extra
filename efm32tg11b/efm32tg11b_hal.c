@@ -6,6 +6,9 @@
 const uint32_t __attribute__((section (".debug_lock"))) user_lock_word[1] = {0xFFFFFFFD};
 static uint8_t PT_KEY[16];
 
+#if SS_VER == SS_VER_2_1
+#warning "This target operates at 38400bps with SSV2! Set target.baud = 38400"
+#endif
 void platform_init(void)
 {
      CMU->HFXOCTRL = 3; //xtal is ext clk

@@ -38,7 +38,11 @@ void init_uart(void)
      PORT_SetPinConfig(PORTE, 0, &uart_pins);
      UART_GetDefaultConfig(&config);
 
-     config.baudRate_Bps = 38400u;
+    #if SS_VER==SS_VER_2_1
+     config.baudRate_Bps = 230400U;
+    #else
+     config.baudRate_Bps = 38400U;
+    #endif
      config.rxFifoWatermark = 0;
      config.enableTx = true;
      config.enableRx = true;

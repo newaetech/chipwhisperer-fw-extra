@@ -78,6 +78,9 @@ void platform_init(void)
 }
 
 
+#if SS_VER == SS_VER_2_1
+#warning "This target operates at 38400bps with SSV2! Set target.baud = 38400"
+#endif
 NRF_SERIAL_DRV_UART_CONFIG_DEF(m_uart0_drv_config,
                       RX_PIN_NUMBER, TX_PIN_NUMBER,
                       0, 0,

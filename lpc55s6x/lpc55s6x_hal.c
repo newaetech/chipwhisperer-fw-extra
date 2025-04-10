@@ -13,6 +13,9 @@
 /* System clock frequency. */
 extern uint32_t SystemCoreClock;
 
+#if SS_VER == SS_VER_2_1
+#warning "This target operates at 38400bps with SSV2! Set target.baud = 38400"
+#endif
 void platform_init(void)
 {
     // switch off systick

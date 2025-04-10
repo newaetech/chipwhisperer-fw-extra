@@ -36,7 +36,11 @@ void init_uart(void)
 {
     lpuart_config_t lpuartConfig;
     LPUART_GetDefaultConfig(&lpuartConfig);
-    lpuartConfig.baudRate_Bps = 38400U;
+    #if SS_VER==SS_VER_2_1
+     lpuartConfig.baudRate_Bps = 230400U;
+    #else
+     lpuartConfig.baudRate_Bps = 38400U;
+    #endif
     lpuartConfig.enableTx = 1;
     lpuartConfig.enableRx = 1;
     LPUART_Init(LPUART1, &lpuartConfig, 80000000U);

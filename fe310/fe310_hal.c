@@ -5,6 +5,9 @@
 
 #include "fe310_hal.h"
 
+#if SS_VER == SS_VER_2_1
+#warning "This target operates at 38400bps with SSV2! Set target.baud = 38400"
+#endif
 static struct metal_gpio *gpio_device;
 
 void platform_init(void)

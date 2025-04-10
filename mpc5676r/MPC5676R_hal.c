@@ -57,6 +57,9 @@ __attribute__ ((weak)) void uart_puts(char * s){
     }
 }
 
+#if SS_VER == SS_VER_2_1
+#warning "This target operates at 38400bps with SSV2! Set target.baud = 38400"
+#endif
 void init_uart(void)
 {
     UART_Init(&uart_pal1_instance, &uart_pal1_Config0);

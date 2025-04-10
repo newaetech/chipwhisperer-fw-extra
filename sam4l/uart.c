@@ -36,6 +36,10 @@ void usart0_reset(void)
 	USART0->US_CR = US_CR_RSTSTA;
 }
 
+#if SS_VER == SS_VER_2_1
+#warning "This target operates at 38400bps with SSV2! Set target.baud = 38400"
+#endif
+
 void uart0_init(void)
 {
     /* Turn on clocks! */

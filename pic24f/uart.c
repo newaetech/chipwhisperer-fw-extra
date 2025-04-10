@@ -1,5 +1,8 @@
 #include <xc.h>
 #include "uart.h"
+#if SS_VER == SS_VER_2_1
+#warning "This target operates at 38400bps with SSV2! Set target.baud = 38400"
+#endif
 
 void init_uart(void)
 {
