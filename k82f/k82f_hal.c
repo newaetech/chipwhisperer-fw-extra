@@ -50,7 +50,11 @@ void init_uart(void)
      /* CLOCK_EnableClock(kCLOCK_Uart1); //enable UART clock */
 
      LPUART_GetDefaultConfig(&config);
+    #if SS_VER==SS_VER_2_1
+     config.baudRate_Bps = 230400U;
+    #else
      config.baudRate_Bps = 38400U;
+    #endif
      config.enableTx = true;
      config.enableRx = true;
 
