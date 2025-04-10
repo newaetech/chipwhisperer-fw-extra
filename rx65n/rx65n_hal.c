@@ -30,7 +30,7 @@ void init_uart(void)
     SCI0.SCR.BIT.CKE = 0x00;
     //enable tx and rx
 
-#if SS_VER == SS_VER_2_0
+#if SS_VER == SS_VER_2_1
     SCI0.BRR = 0; //divide by 1
     SCI0.SMR.BIT.CKS = 0b10; //PCLKB / 8  works out well for 38400bps I think??? Should be about 39000bps
 #else

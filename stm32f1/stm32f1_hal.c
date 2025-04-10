@@ -63,7 +63,7 @@ void init_uart(void)
 
 	__HAL_RCC_USART1_CLK_ENABLE();
 	UartHandle.Instance        = USART1;
-  #if SS_VER==SS_VER_2_0
+  #if SS_VER==SS_VER_2_1
   UartHandle.Init.BaudRate   = 230400;
   #else
   UartHandle.Init.BaudRate   = 38400;
