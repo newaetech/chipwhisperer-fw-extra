@@ -44,6 +44,10 @@
 #include "stm32f4xx_hal_flash.h"
 #include "stm32f4xx_hal_cryp.h"
 
+#ifndef F_CPU
+#define F_CPU 7.37E6
+#endif
+
 #define assert_param(expr) ((void)0U)
 
 #define CLOCKSWITCH_TIMEOUT_VALUE  5000U /* 5 s */
@@ -583,7 +587,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
 {
   /* Get HCLK source and Compute PCLK1 frequency ---------------------------*/
   //return (HAL_RCC_GetHCLKFreq() >> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE1)>> POSITION_VAL(RCC_CFGR_PPRE1)]);
-  return 7.37E6;
+  return F_CPU;
 }
 
 /**
@@ -596,7 +600,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
 {
   /* Get HCLK source and Compute PCLK2 frequency ---------------------------*/
   //return (HAL_RCC_GetHCLKFreq()>> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE2)>> POSITION_VAL(RCC_CFGR_PPRE2)]);
-  return 7.37E6;
+  return F_CPU;
 }
 
 

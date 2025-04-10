@@ -36,7 +36,7 @@ CFLAGS += -mthumb -fmessage-length=0 -ffunction-sections
 CPPFLAGS += -mthumb -fmessage-length=0 -ffunction-sections 
 ASFLAGS += -mthumb -fmessage-length=0 -ffunction-sections
 
-CDEFS += -DSTM32L562RGTx -DSTM32L5 -DSTM32 -DDEBUG -DSTM32L562xx
-CPPDEFS += -DSTM32F562RGTx -DSTM32L5 -DSTM32 -DDEBUG
+CDEFS += -DSTM32L562RGTx -DSTM32L5 -DSTM32 -DDEBUG -DSTM32L562xx -DHSE_VALUE=$(F_CPU)
+CPPDEFS += -DSTM32F562RGTx -DSTM32L5 -DSTM32 -DDEBUG -DHSE_VALUE=$(F_CPU)
 
 LDFLAGS += --specs=nano.specs -T $(HALPATH)/stm32l5/stm32l562xx.ld -Wl,--gc-sections -lm
