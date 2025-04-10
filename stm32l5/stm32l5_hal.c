@@ -7,6 +7,14 @@
 #include "stm32l5xx_hal_uart.h"
 #include "stm32l5xx_hal_cryp.h"
 
+#ifndef UART_INITBAUD
+#if SS_VER==SS_VER_2_1
+#define UART_INITBAUD 230400
+#else
+#define UART_INITBAUD 38400
+#endif
+#endif
+
 //Just copy these from another project - hopefully ok..
 uint32_t SystemCoreClock = 4000000U;
 
@@ -98,11 +106,7 @@ void init_uart(void)
     HAL_GPIO_Init(GPIOA, &GpioInit);
 
     UartHandle.Instance        = USART1;
-  #if SS_VER==SS_VER_2_1
-  UartHandle.Init.BaudRate   = 230400;
-  #else
-  UartHandle.Init.BaudRate   = 38400;
-  #endif
+    UartHandle.Init.BaudRate   = UART_INITBAUD;
     UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
     UartHandle.Init.StopBits   = UART_STOPBITS_1;
     UartHandle.Init.Parity     = UART_PARITY_NONE;

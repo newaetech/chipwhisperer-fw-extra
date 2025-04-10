@@ -41,3 +41,8 @@ ifeq ($(STM32F4_WLCSP), 1)
 endif
 
 LDFLAGS +=  --specs=nosys.specs -T $(HALPATH)/stm32f4/LinkerScript.ld -Wl,--gc-sections -lm
+
+ifneq ($(UART_INITBAUD),)
+  CDEFS += -DUART_INITBAUD=$(UART_INITBAUD)
+  CPPDEFS += -DUART_INITBAUD=$(UART_INITBAUD)
+endif
