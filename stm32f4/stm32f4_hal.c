@@ -59,9 +59,9 @@ void platform_init(void)
 	RCC_OscInitStruct.HSIState       = RCC_HSI_ON;  // HSI is needed for the RNG
 	RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;  // we need PLL to use RNG
 	RCC_OscInitStruct.PLL.PLLSource  = RCC_PLLSOURCE_HSE;
-	RCC_OscInitStruct.PLL.PLLM       = 12;  // Internal clock is 16MHz
-	RCC_OscInitStruct.PLL.PLLN       = 196;
-	RCC_OscInitStruct.PLL.PLLP       = RCC_PLLP_DIV4;
+	RCC_OscInitStruct.PLL.PLLM       = 7;  // External clock is 7.3728MHz
+	RCC_OscInitStruct.PLL.PLLN       = 319;
+	RCC_OscInitStruct.PLL.PLLP       = RCC_PLLP_DIV8;
 	RCC_OscInitStruct.PLL.PLLQ       = 7;  // divisor for RNG, USB and SDIO
 	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         for(;;);
@@ -72,8 +72,8 @@ void platform_init(void)
 	RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_PLLCLK;
 	RCC_ClkInitStruct.AHBCLKDivider  = RCC_SYSCLK_DIV1;
 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
-	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_ACR_LATENCY_5WS);
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_ACR_LATENCY_1WS); // 1 wait state needed for < 60MHz
     FLASH->ACR |= 0b111 << 8; //enable ART acceleration
 
 #else
@@ -83,9 +83,9 @@ void platform_init(void)
 	RCC_OscInitStruct.HSIState       = RCC_HSI_ON;  // HSI is needed for the RNG
 	RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;  // we need PLL to use RNG
 	RCC_OscInitStruct.PLL.PLLSource  = RCC_PLLSOURCE_HSE;
-	RCC_OscInitStruct.PLL.PLLM       = 12;  // Internal clock is 16MHz
-	RCC_OscInitStruct.PLL.PLLN       = 196;
-	RCC_OscInitStruct.PLL.PLLP       = RCC_PLLP_DIV4;
+	RCC_OscInitStruct.PLL.PLLM       = 7;  // External clock is 7.3728MHz
+	RCC_OscInitStruct.PLL.PLLN       = 319;
+	RCC_OscInitStruct.PLL.PLLP       = RCC_PLLP_DIV8;
 	RCC_OscInitStruct.PLL.PLLQ       = 7;  // divisor for RNG, USB and SDIO
 	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         for(;;);
@@ -97,7 +97,7 @@ void platform_init(void)
 	RCC_ClkInitStruct.AHBCLKDivider  = RCC_SYSCLK_DIV1;
 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
 	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_ACR_LATENCY_0WS); //wait states not needed for HSE
+	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_ACR_LATENCY_0WS); // wait states not needed for < 30MHz
 #endif
 
 	// Configure and starts the RNG
@@ -116,7 +116,7 @@ void init_uart(void)
 	GpioInit.Pull      = GPIO_PULLUP;
 	GpioInit.Speed     = GPIO_SPEED_FREQ_HIGH;
 	GpioInit.Alternate = GPIO_AF7_USART1;
-	__GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
 	HAL_GPIO_Init(GPIOA, &GpioInit);
 
 	UartHandle.Instance        = USART1;
@@ -134,7 +134,7 @@ void init_uart(void)
 
 void trigger_setup(void)
 {
-	__GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
 #ifdef STM32F4_WLCSP
  	GPIO_InitTypeDef GpioInit;
 	GpioInit.Pin       = GPIO_PIN_4;
@@ -151,7 +151,10 @@ void trigger_setup(void)
 	GpioInit.Speed     = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOA, &GpioInit);
 #endif
+
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, RESET);
 }
+
 void trigger_high(void)
 {
 #ifdef STM32F4_WLCSP
@@ -169,6 +172,7 @@ void trigger_low(void)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, RESET);
 #endif
 }
+
 char getch(void)
 {
 	uint8_t d;

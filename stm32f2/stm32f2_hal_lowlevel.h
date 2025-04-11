@@ -45,7 +45,7 @@
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
 #if !defined  (HSE_VALUE)
-  #define HSE_VALUE    (7384600U) /*!< Value of the External oscillator in Hz */
+  #define HSE_VALUE    (7372800U) /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
@@ -105,7 +105,7 @@
 #define  DATA_CACHE_ENABLE            1U
 
 
-//#define STM32F205xx
+//#define STM32F215xx
 #include "stm32f2xx.h"
 
 #endif

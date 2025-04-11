@@ -1,5 +1,5 @@
 VPATH += :$(HALPATH)/stm32f2
-SRC += stm32f2_hal.c stm32f2_hal_lowlevel.c stm32f2_sysmem.c
+SRC += stm32f2_hal.c stm32f2_hal_lowlevel.c stm32f2_sysmem.c stm32f2xx_hal_rng.c
 EXTRAINCDIRS += $(HALPATH)/stm32f2 $(HALPATH)/stm32f2/CMSIS $(HALPATH)/stm32f2/CMSIS/core $(HALPATH)/stm32f2/CMSIS/device $(HALPATH)/stm32f2/Legacy
 
 ASRC += stm32f2_startup.S
@@ -20,14 +20,16 @@ CFLAGS += -mthumb -mfloat-abi=soft -fmessage-length=0 -ffunction-sections
 CPPFLAGS += -mthumb -mfloat-abi=soft -fmessage-length=0 -ffunction-sections
 ASFLAGS += -mthumb -mfloat-abi=soft -fmessage-length=0 -ffunction-sections
 
+
+CDEFS += -DSTM32F215RGTx -DSTM32F2 -DSTM32 -DDEBUG -DSTM32F215xx
+CPPDEFS += -DSTM32F215RGTx -DSTM32F2 -DSTM32 -DDEBUG
+
 ifeq ($(MCU_CLK), INT)
   CFLAGS += -DUSE_INTERNAL_CLK
 endif
 
-CDEFS += -DSTM32F205RETx -DSTM32F2 -DSTM32 -DDEBUG
-CPPDEFS += -DSTM32F205RETx -DSTM32F2 -DSTM32 -DDEBUG
 
-LDFLAGS +=  --specs=nano.specs -T $(HALPATH)/stm32f2/LinkerScript.ld -Wl,--gc-sections -lm
+LDFLAGS +=  --specs=nosys.specs -T $(HALPATH)/stm32f2/LinkerScript.ld -Wl,--gc-sections -lm
 
 ifneq ($(UART_INITBAUD),)
   CDEFS += -DUART_INITBAUD=$(UART_INITBAUD)
