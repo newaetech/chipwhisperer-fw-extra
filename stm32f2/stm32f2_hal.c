@@ -17,7 +17,7 @@ void platform_init(void)
 	//HAL_Init();
 
 #if defined(USE_INTERNAL_CLK)
-     RCC_OscInitTypeDef RCC_OscInitStruct;
+     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
      RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
      RCC_OscInitStruct.HSEState       = RCC_HSE_OFF;
      RCC_OscInitStruct.HSIState       = RCC_HSI_ON;
@@ -29,7 +29,7 @@ void platform_init(void)
 	 RCC_OscInitStruct.PLL.PLLQ       = 7;  // divisor for RNG, USB and SDIO
      HAL_RCC_OscConfig(&RCC_OscInitStruct);
 
-     RCC_ClkInitTypeDef RCC_ClkInitStruct;
+     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
      RCC_ClkInitStruct.ClockType      = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
      RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_HSI;
      RCC_ClkInitStruct.AHBCLKDivider  = RCC_SYSCLK_DIV1;
@@ -37,7 +37,7 @@ void platform_init(void)
      RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
      HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_ACR_LATENCY_0WS); // wait states not needed for < 30MHz
 #elif defined(USE_PLL)
-	RCC_OscInitTypeDef RCC_OscInitStruct;
+	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_HSI;
 	RCC_OscInitStruct.HSEState       = RCC_HSE_BYPASS;
 	RCC_OscInitStruct.HSIState       = RCC_HSI_ON;  // HSI is needed for the RNG
@@ -51,7 +51,7 @@ void platform_init(void)
         for(;;);
     }
 
-	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 	RCC_ClkInitStruct.ClockType      = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
 	RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_PLLCLK;
 	RCC_ClkInitStruct.AHBCLKDivider  = HSE_AHBCLKDIV_HVALUE;
@@ -61,7 +61,7 @@ void platform_init(void)
     FLASH->ACR |= 0b111 << 8; //enable ART acceleration
 
 #else
-	RCC_OscInitTypeDef RCC_OscInitStruct;
+	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_HSI;
 	RCC_OscInitStruct.HSEState       = RCC_HSE_BYPASS;
 	RCC_OscInitStruct.HSIState       = RCC_HSI_ON;  // HSI is needed for the RNG
@@ -75,7 +75,7 @@ void platform_init(void)
         for(;;);
     }
 
-	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 	RCC_ClkInitStruct.ClockType      = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
 	RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_HSE;
 	RCC_ClkInitStruct.AHBCLKDivider  = HSE_AHBCLKDIV_HVALUE;
