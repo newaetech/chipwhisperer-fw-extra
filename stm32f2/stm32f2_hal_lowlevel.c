@@ -43,9 +43,6 @@
 #include "stm32f2xx_hal_uart.h"
 #include "stm32f2xx_hal_flash.h"
 
-#ifndef F_CPU
-#define F_CPU 7372800U
-#endif
 
 #define assert_param(expr) ((void)0U)
 
@@ -58,12 +55,12 @@ uint32_t HAL_GetTick(void)
 	return tick++;;
 }
 
-#define RCC_CFGR_HPRE_BITNUMBER           POSITION_VAL(RCC_CFGR_HPRE)
+// #define RCC_CFGR_HPRE_BITNUMBER           POSITION_VAL(RCC_CFGR_HPRE)
 
-const uint8_t APBAHBPrescTable[16] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U, 1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
+// const uint8_t APBAHBPrescTable[16] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U, 1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
 
-#define UART_CR1_FIELDS  ((uint32_t)(USART_CR1_M | USART_CR1_PCE | USART_CR1_PS | \
-                                     USART_CR1_TE | USART_CR1_RE | USART_CR1_OVER8)) /*!< UART or USART CR1 fields of parameters set by UART_SetConfig API */
+/* #define UART_CR1_FIELDS  ((uint32_t)(USART_CR1_M | USART_CR1_PCE | USART_CR1_PS | \
+                                     USART_CR1_TE | USART_CR1_RE | USART_CR1_OVER8)) */ /*!< UART or USART CR1 fields of parameters set by UART_SetConfig API */
 
 
 
@@ -552,7 +549,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
 {
   /* Get HCLK source and Compute PCLK1 frequency ---------------------------*/
   //return (HAL_RCC_GetHCLKFreq() >> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE1)>> POSITION_VAL(RCC_CFGR_PPRE1)]);
-  return F_CPU;
+  return (uint32_t)PCLK1_FREQ;
 }
 
 /**
@@ -565,7 +562,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
 {
   /* Get HCLK source and Compute PCLK2 frequency ---------------------------*/
   //return (HAL_RCC_GetHCLKFreq()>> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE2)>> POSITION_VAL(RCC_CFGR_PPRE2)]);
-  return F_CPU;
+  return (uint32_t)PCLK2_FREQ;
 }
 
 
