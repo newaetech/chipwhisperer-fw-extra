@@ -60,6 +60,8 @@
 //#include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_rng.h"
 
+extern uint32_t HAL_GetTick(void);
+
 /** @addtogroup STM32F4xx_HAL_Driver
   * @{
   */
