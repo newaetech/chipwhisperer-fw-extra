@@ -30,4 +30,4 @@ jobs:
           cd firmware/mcu/hal && git submodule update --init chipwhisperer-fw-extra
       - name: Build firmware
         run: >-
-          cd tests && bash test_fw_build.sh
+          cd chipwhisperer/tests && bash test_fw_build.sh
