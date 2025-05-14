@@ -7,6 +7,14 @@
 #include "stm32f1xx_hal_uart.h"
 #include "stm32f1xx_hal_flash.h"
 
+#ifndef UART_INITBAUD
+#if SS_VER==SS_VER_2_1
+#define UART_INITBAUD 230400
+#else
+#define UART_INITBAUD 38400
+#endif
+#endif
+
 UART_HandleTypeDef UartHandle;
 
 
@@ -63,11 +71,7 @@ void init_uart(void)
 
 	__HAL_RCC_USART1_CLK_ENABLE();
 	UartHandle.Instance        = USART1;
-  #if SS_VER==SS_VER_2_1
-  UartHandle.Init.BaudRate   = 230400;
-  #else
-  UartHandle.Init.BaudRate   = 38400;
-  #endif
+	UartHandle.Init.BaudRate   = UART_INITBAUD;
 	UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
 	UartHandle.Init.StopBits   = UART_STOPBITS_1;
 	UartHandle.Init.Parity     = UART_PARITY_NONE;

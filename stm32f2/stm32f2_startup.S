@@ -8,7 +8,7 @@
   */
 
   .syntax unified
-  .cpu cortex-m4
+  .cpu cortex-m3
   .thumb
 
 .global	g_pfnVectors

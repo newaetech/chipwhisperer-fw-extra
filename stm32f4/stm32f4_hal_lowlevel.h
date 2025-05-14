@@ -45,12 +45,44 @@
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
 #if !defined  (HSE_VALUE)
-  #define HSE_VALUE    (7370000U) /*!< Value of the External oscillator in Hz */
+  #define HSE_VALUE    (7372800U) /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
   #define HSE_STARTUP_TIMEOUT    (100U)   /*!< Time out for HSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
+
+#if !defined (HSE_PLLM_VALUE)
+  #define HSE_PLLM_VALUE (7U)
+#endif /* HSE_PLLM_VALUE */
+
+#if !defined (HSE_PLLN_VALUE)
+  #define HSE_PLLN_VALUE (319U)
+#endif /* HSE_PLLN_VALUE */
+
+#if !defined (HSE_PLLP_VALUE)
+  #define HSE_PLLP_VALUE (8U)
+#endif /* HSE_PLLP_VALUE */
+
+#if !defined (HSE_PLLQ_VALUE)
+  #define HSE_PLLQ_VALUE (7U)
+#endif /* HSE_PLLQ_VALUE */
+
+#if !defined (HSE_AHBCLKDIV_VALUE)
+  #define HSE_AHBCLKDIV_VALUE (1U)
+#endif /* HSE_AHBCLKDIV_VALUE */
+
+#if !defined (HSE_APB1CLKDIV_VALUE)
+  #if HSE_VALUE > 42000000U
+    #define HSE_APB1CLKDIV_VALUE (2U)        /* PCLK1 max freq is 42 MHz */
+  #else
+    #define HSE_APB1CLKDIV_VALUE (1U)
+  #endif
+#endif /* HSE_APB1CLKDIV_VALUE */
+
+#if !defined (HSE_APB2CLKDIV_VALUE)
+  #define HSE_APB2CLKDIV_VALUE (1U)           /* PCLK2 max freq is 84 MHz */
+#endif /* HSE_APB2CLKDIV_VALUE */
 
 /**
   * @brief Internal High Speed oscillator (HSI) value.
@@ -92,6 +124,18 @@
 /* Tip: To avoid modifying this file each time you need to use different HSE,
    ===  you can define the HSE value in your toolchain compiler preprocessor. */
 
+/* ########################### UART Configuration ######################### */
+/**
+  * @brief UART initial baudrate
+  */
+#if !defined(UART_INITBAUD)
+  #if SS_VER==SS_VER_2_1
+    #define UART_INITBAUD 230400
+  #else
+    #define UART_INITBAUD 38400
+  #endif
+#endif
+
 /* ########################### System Configuration ######################### */
 /**
   * @brief This is the HAL system configuration section
@@ -107,5 +151,110 @@
 
 //#define STM32F415xx
 #include "stm32f4xx.h"
+
+/* ########################### Generated Values ######################### */
+#if defined(USE_INTERNAL_CLK)
+    #define SYSCLK_FREQ (HSI_VALUE)
+#elif defined(USE_PLL)
+    #define SYSCLK_FREQ (HSE_VALUE / HSE_PLLM_VALUE * HSE_PLLN_VALUE / HSE_PLLP_VALUE)
+#else
+    #define SYSCLK_FREQ (HSE_VALUE)
+#endif
+
+#define HCLK_FREQ  (SYSCLK_FREQ / HSE_AHBCLKDIV_VALUE)
+#define PCLK1_FREQ (HCLK_FREQ / HSE_APB1CLKDIV_VALUE)
+#define PCLK2_FREQ (HCLK_FREQ / HSE_APB2CLKDIV_VALUE)
+
+#if HSE_VALUE > 50000000U
+  #error "Maximum allowed HSE_VALUE is 50MHz"
+#endif
+#if HCLK_FREQ > 168000000U
+  #error "Maximum allowed HCLK_FREQ is 168MHz"
+#endif
+#if PCLK1_FREQ > 42000000U
+  #error "Maximum allowed PCLK1_FREQ is 42MHz"
+#endif
+#if PCLK2_FREQ > 84000000U
+  #error "Maximum allowed PCLK2_FREQ is 84MHz"
+#endif
+
+#if HSE_PLLM_VALUE < 2U || HSE_PLLM_VALUE > 63U
+  #error "HSE_PLLM_VALUE not supported"
+#endif
+#if HSE_PLLN_VALUE < 50U || HSE_PLLN_VALUE > 432U
+  #error "HSE_PLLN_VALUE not supported"
+#endif
+#if HSE_PLLP_VALUE != 2U && HSE_PLLP_VALUE != 4U && HSE_PLLP_VALUE != 6U && HSE_PLLP_VALUE != 8U
+  #error "HSE_PLLP_VALUE not supported"
+#endif
+#if HSE_PLLQ_VALUE < 2U || HSE_PLLQ_VALUE > 15U
+  #error "HSE_PLLQ_VALUE not supported"
+#endif
+
+#if HSE_AHBCLKDIV_VALUE == 1
+  #define HSE_AHBCLKDIV_HVALUE RCC_CFGR_HPRE_DIV1
+#elif HSE_AHBCLKDIV_VALUE == 2
+  #define HSE_AHBCLKDIV_HVALUE RCC_CFGR_HPRE_DIV2
+#elif HSE_AHBCLKDIV_VALUE == 4
+  #define HSE_AHBCLKDIV_HVALUE RCC_CFGR_HPRE_DIV4
+#elif HSE_AHBCLKDIV_VALUE == 8
+  #define HSE_AHBCLKDIV_HVALUE RCC_CFGR_HPRE_DIV8
+#elif HSE_AHBCLKDIV_VALUE == 16
+  #define HSE_AHBCLKDIV_HVALUE RCC_CFGR_HPRE_DIV16
+#elif HSE_AHBCLKDIV_VALUE == 64
+  #define HSE_AHBCLKDIV_HVALUE RCC_CFGR_HPRE_DIV64
+#elif HSE_AHBCLKDIV_VALUE == 128
+  #define HSE_AHBCLKDIV_HVALUE RCC_CFGR_HPRE_DIV128
+#elif HSE_AHBCLKDIV_VALUE == 256
+  #define HSE_AHBCLKDIV_HVALUE RCC_CFGR_HPRE_DIV256
+#elif HSE_AHBCLKDIV_VALUE == 512
+  #define HSE_AHBCLKDIV_HVALUE RCC_CFGR_HPRE_DIV512
+#else
+  #error "HSE_AHBCLKDIV_VALUE not supported"
+#endif
+
+#if HSE_APB1CLKDIV_VALUE == 1
+  #define HSE_APB1CLKDIV_HVALUE RCC_CFGR_PPRE1_DIV1
+#elif HSE_APB1CLKDIV_VALUE == 2
+  #define HSE_APB1CLKDIV_HVALUE RCC_CFGR_PPRE1_DIV2
+#elif HSE_APB1CLKDIV_VALUE == 4
+  #define HSE_APB1CLKDIV_HVALUE RCC_CFGR_PPRE1_DIV4
+#elif HSE_APB1CLKDIV_VALUE == 8
+  #define HSE_APB1CLKDIV_HVALUE RCC_CFGR_PPRE1_DIV8
+#elif HSE_APB1CLKDIV_VALUE == 16
+  #define HSE_APB1CLKDIV_HVALUE RCC_CFGR_PPRE1_DIV16
+#else
+  #error "HSE_APB1CLKDIV_VALUE not supported"
+#endif
+
+#if HSE_APB2CLKDIV_VALUE == 1
+  #define HSE_APB2CLKDIV_HVALUE RCC_CFGR_PPRE2_DIV1
+#elif HSE_APB2CLKDIV_VALUE == 2
+  #define HSE_APB2CLKDIV_HVALUE RCC_CFGR_PPRE2_DIV2
+#elif HSE_APB2CLKDIV_VALUE == 4
+  #define HSE_APB2CLKDIV_HVALUE RCC_CFGR_PPRE2_DIV4
+#elif HSE_APB2CLKDIV_VALUE == 8
+  #define HSE_APB2CLKDIV_HVALUE RCC_CFGR_PPRE2_DIV8
+#elif HSE_APB2CLKDIV_VALUE == 16
+  #define HSE_APB2CLKDIV_HVALUE RCC_CFGR_PPRE2_DIV16
+#else
+  #error "HSE_APB2CLKDIV_VALUE not supported"
+#endif
+
+#if HCLK_FREQ <= 30000000U
+  #define FLASH_LATENCY_HVALUE FLASH_ACR_LATENCY_0WS
+#elif HCLK_FREQ <= 60000000U
+  #define FLASH_LATENCY_HVALUE FLASH_ACR_LATENCY_1WS
+#elif HCLK_FREQ <= 90000000U
+  #define FLASH_LATENCY_HVALUE FLASH_ACR_LATENCY_2WS
+#elif HCLK_FREQ <= 120000000U
+  #define FLASH_LATENCY_HVALUE FLASH_ACR_LATENCY_3WS
+#elif HCLK_FREQ <= 150000000U
+  #define FLASH_LATENCY_HVALUE FLASH_ACR_LATENCY_4WS
+#elif HCLK_FREQ <= 168000000U
+  #define FLASH_LATENCY_HVALUE FLASH_ACR_LATENCY_5WS
+#else
+  #error "HCLK_FREQ not supported"
+#endif
 
 #endif

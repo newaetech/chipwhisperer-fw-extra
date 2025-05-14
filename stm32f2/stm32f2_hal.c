@@ -5,47 +5,91 @@
 #include "stm32f2xx_hal_gpio.h"
 #include "stm32f2xx_hal_dma.h"
 #include "stm32f2xx_hal_uart.h"
+#include "stm32f2xx_hal_rng.h"
 
+
+
+RNG_HandleTypeDef RngHandle;
 UART_HandleTypeDef UartHandle;
-
 
 void platform_init(void)
 {
 	//HAL_Init();
 
-#ifdef USE_INTERNAL_CLK
-     RCC_OscInitTypeDef RCC_OscInitStruct;
+#if defined(USE_INTERNAL_CLK)
+     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
      RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
      RCC_OscInitStruct.HSEState       = RCC_HSE_OFF;
      RCC_OscInitStruct.HSIState       = RCC_HSI_ON;
-     RCC_OscInitStruct.PLL.PLLSource  = RCC_PLL_NONE;
+	 RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;  // we need PLL to use RNG
+	 RCC_OscInitStruct.PLL.PLLSource  = RCC_PLLSOURCE_HSI;
+	 RCC_OscInitStruct.PLL.PLLM       = 16;  // Internal clock is 16MHz.
+	 RCC_OscInitStruct.PLL.PLLN       = 336;
+	 RCC_OscInitStruct.PLL.PLLP       = 2;
+	 RCC_OscInitStruct.PLL.PLLQ       = 7;  // divisor for RNG, USB and SDIO
      HAL_RCC_OscConfig(&RCC_OscInitStruct);
 
-     RCC_ClkInitTypeDef RCC_ClkInitStruct;
+     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
      RCC_ClkInitStruct.ClockType      = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
      RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_HSI;
      RCC_ClkInitStruct.AHBCLKDivider  = RCC_SYSCLK_DIV1;
      RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
      RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-     uint32_t flash_latency = 0;
-     HAL_RCC_ClockConfig(&RCC_ClkInitStruct, flash_latency);
-#else
-	RCC_OscInitTypeDef RCC_OscInitStruct;
+     HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_ACR_LATENCY_0WS); // wait states not needed for < 30MHz
+#elif defined(USE_PLL)
+	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_HSI;
 	RCC_OscInitStruct.HSEState       = RCC_HSE_BYPASS;
-	RCC_OscInitStruct.HSIState       = RCC_HSI_OFF;
-	RCC_OscInitStruct.PLL.PLLSource  = RCC_PLL_NONE;
-	HAL_RCC_OscConfig(&RCC_OscInitStruct);
+	RCC_OscInitStruct.HSIState       = RCC_HSI_ON;  // HSI is needed for the RNG
+	RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;  // we need PLL to use RNG
+	RCC_OscInitStruct.PLL.PLLSource  = RCC_PLLSOURCE_HSE;
+	RCC_OscInitStruct.PLL.PLLM       = HSE_PLLM_VALUE;
+	RCC_OscInitStruct.PLL.PLLN       = HSE_PLLN_VALUE;
+	RCC_OscInitStruct.PLL.PLLP       = HSE_PLLP_VALUE;
+	RCC_OscInitStruct.PLL.PLLQ       = HSE_PLLQ_VALUE;  // divisor for RNG, USB and SDIO
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+        for(;;);
+    }
 
-	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+	RCC_ClkInitStruct.ClockType      = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
+	RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider  = HSE_AHBCLKDIV_HVALUE;
+	RCC_ClkInitStruct.APB1CLKDivider = HSE_APB1CLKDIV_HVALUE;
+	RCC_ClkInitStruct.APB2CLKDivider = HSE_APB2CLKDIV_HVALUE;
+	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_HVALUE);
+    FLASH->ACR |= 0b111 << 8; //enable ART acceleration
+
+#else
+	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_HSI;
+	RCC_OscInitStruct.HSEState       = RCC_HSE_BYPASS;
+	RCC_OscInitStruct.HSIState       = RCC_HSI_ON;  // HSI is needed for the RNG
+	RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;  // we need PLL to use RNG
+	RCC_OscInitStruct.PLL.PLLSource  = RCC_PLLSOURCE_HSE;
+	RCC_OscInitStruct.PLL.PLLM       = HSE_PLLM_VALUE;
+	RCC_OscInitStruct.PLL.PLLN       = HSE_PLLN_VALUE;
+	RCC_OscInitStruct.PLL.PLLP       = HSE_PLLP_VALUE;
+	RCC_OscInitStruct.PLL.PLLQ       = HSE_PLLQ_VALUE;  // divisor for RNG, USB and SDIO
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+        for(;;);
+    }
+
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 	RCC_ClkInitStruct.ClockType      = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
 	RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_HSE;
-	RCC_ClkInitStruct.AHBCLKDivider  = RCC_SYSCLK_DIV1;
-	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-	uint32_t flash_latency = 5;
-	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, flash_latency);
-  #endif
+	RCC_ClkInitStruct.AHBCLKDivider  = HSE_AHBCLKDIV_HVALUE;
+	RCC_ClkInitStruct.APB1CLKDivider = HSE_APB1CLKDIV_HVALUE;
+	RCC_ClkInitStruct.APB2CLKDivider = HSE_APB2CLKDIV_HVALUE;
+	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_HVALUE);
+#endif
+
+	// Configure and starts the RNG
+	__HAL_RCC_RNG_CLK_ENABLE();
+	RngHandle.Instance = RNG;
+	RngHandle.State = HAL_RNG_STATE_RESET;
+	HAL_RNG_Init(&RngHandle);
+
 }
 
 void init_uart(void)
@@ -56,15 +100,11 @@ void init_uart(void)
 	GpioInit.Pull      = GPIO_PULLUP;
 	GpioInit.Speed     = GPIO_SPEED_FREQ_HIGH;
 	GpioInit.Alternate = GPIO_AF7_USART1;
-	__GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
 	HAL_GPIO_Init(GPIOA, &GpioInit);
 
 	UartHandle.Instance        = USART1;
-  #if SS_VER==SS_VER_2_1
-  UartHandle.Init.BaudRate   = 230400;
-  #else
-  UartHandle.Init.BaudRate   = 38400;
-  #endif
+	UartHandle.Init.BaudRate   = UART_INITBAUD;
 	UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
 	UartHandle.Init.StopBits   = UART_STOPBITS_1;
 	UartHandle.Init.Parity     = UART_PARITY_NONE;
@@ -77,14 +117,14 @@ void init_uart(void)
 void trigger_setup(void)
 {
 	__HAL_RCC_GPIOA_CLK_ENABLE();
-	
+
 	GPIO_InitTypeDef GpioInit;
 	GpioInit.Pin       = GPIO_PIN_12;
 	GpioInit.Mode      = GPIO_MODE_OUTPUT_PP;
 	GpioInit.Pull      = GPIO_NOPULL;
 	GpioInit.Speed     = GPIO_SPEED_FREQ_HIGH;
 	HAL_GPIO_Init(GPIOA, &GpioInit);
-	
+
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, RESET);
 }
 
@@ -96,7 +136,7 @@ void trigger_high(void)
 void trigger_low(void)
 {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, RESET);
-}   
+}
 
 char getch(void)
 {
@@ -111,3 +151,14 @@ void putch(char c)
 	HAL_UART_Transmit(&UartHandle,  &d, 1, 5000);
 }
 
+uint32_t get_rand(void)
+{
+	uint32_t prev_rand = RngHandle.RandomNumber;
+	uint32_t next_rand;
+	HAL_StatusTypeDef error;
+
+	do {
+		error = HAL_RNG_GenerateRandomNumber(&RngHandle, &next_rand);
+  	} while (error != HAL_OK && prev_rand == next_rand);
+  	return next_rand;
+}

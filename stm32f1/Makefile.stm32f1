@@ -29,3 +29,8 @@ CPPDEFS += -DSTM32F100xB -DSTM32F1 -DSTM32 -DDEBUG
 
 LDFLAGS +=  --specs=nano.specs -T $(HALPATH)/stm32f1/LinkerScript.ld -Wl,--gc-sections -lm
 LDFLAGS += -mthumb -mcpu=cortex-m3
+
+ifneq ($(UART_INITBAUD),)
+  CDEFS += -DUART_INITBAUD=$(UART_INITBAUD)
+  CPPDEFS += -DUART_INITBAUD=$(UART_INITBAUD)
+endif

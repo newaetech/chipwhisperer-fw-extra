@@ -2,7 +2,7 @@
    for space reasons, to avoid having several MB of HAL functions that most people
    will not use. In addition this HAL is slightly less demanding (no interrupts),
    but less robust as doesn't implement the timeouts.
-   
+
    The original HAL files are COPYRIGHT STMicroelectronics, as shown below:
 */
 
@@ -32,7 +32,7 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-*/ 
+*/
 
 
 #include "stm32f4_hal.h"
@@ -44,9 +44,10 @@
 #include "stm32f4xx_hal_flash.h"
 #include "stm32f4xx_hal_cryp.h"
 
+
 #define assert_param(expr) ((void)0U)
 
-#define CLOCKSWITCH_TIMEOUT_VALUE  5000U /* 5 s */
+#define CLOCKSWITCH_TIMEOUT_VALUE  ((uint32_t)5000U) /* 5 s */
 
 
 uint32_t HAL_GetTick(void)
@@ -58,8 +59,8 @@ uint32_t HAL_GetTick(void)
 /**
   * @brief  Enables or disables the AHB2 peripheral clock.
   * @note   After reset, the peripheral clock (used for registers read/write access)
-  *         is disabled and the application software has to enable this clock before 
-  *         using it. 
+  *         is disabled and the application software has to enable this clock before
+  *         using it.
   * @param  RCC_AHBPeriph: specifies the AHB2 peripheral to gates its clock.
   *          This parameter can be any combination of the following values:
   *            @arg RCC_AHB2Periph_DCMI:   DCMI clock
@@ -71,21 +72,21 @@ uint32_t HAL_GetTick(void)
   *          This parameter can be: ENABLE or DISABLE.
   * @retval None
   */
-void RCC_AHB2PeriphClockCmd(uint32_t RCC_AHB2Periph, FunctionalState NewState)
-{
-  /* Check the parameters */
-  assert_param(IS_RCC_AHB2_PERIPH(RCC_AHB2Periph));
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
+// void RCC_AHB2PeriphClockCmd(uint32_t RCC_AHB2Periph, FunctionalState NewState)
+// {
+//   /* Check the parameters */
+//   assert_param(IS_RCC_AHB2_PERIPH(RCC_AHB2Periph));
+//   assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-  if (NewState != DISABLE)
-  {
-    RCC->AHB2ENR |= RCC_AHB2Periph;
-  }
-  else
-  {
-    RCC->AHB2ENR &= ~RCC_AHB2Periph;
-  }
-}
+//   if (NewState != DISABLE)
+//   {
+//     RCC->AHB2ENR |= RCC_AHB2Periph;
+//   }
+//   else
+//   {
+//     RCC->AHB2ENR &= ~RCC_AHB2Periph;
+//   }
+// }
 
 /**
   * @brief  Initializes the RCC Oscillators according to the specified parameters in the
@@ -583,7 +584,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
 {
   /* Get HCLK source and Compute PCLK1 frequency ---------------------------*/
   //return (HAL_RCC_GetHCLKFreq() >> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE1)>> POSITION_VAL(RCC_CFGR_PPRE1)]);
-  return 7.37E6;
+  return (uint32_t)PCLK1_FREQ;
 }
 
 /**
@@ -596,20 +597,20 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
 {
   /* Get HCLK source and Compute PCLK2 frequency ---------------------------*/
   //return (HAL_RCC_GetHCLKFreq()>> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE2)>> POSITION_VAL(RCC_CFGR_PPRE2)]);
-  return 7.37E6;
+  return (uint32_t)PCLK2_FREQ;
 }
 
 
 
-#define GPIO_MODE             0x00000003U
-#define EXTI_MODE             0x10000000U
-#define GPIO_MODE_IT          0x00010000U
-#define GPIO_MODE_EVT         0x00020000U
-#define RISING_EDGE           0x00100000U
-#define FALLING_EDGE          0x00200000U
-#define GPIO_OUTPUT_TYPE      0x00000010U
+#define GPIO_MODE             ((uint32_t)0x00000003U)
+#define EXTI_MODE             ((uint32_t)0x10000000U)
+#define GPIO_MODE_IT          ((uint32_t)0x00010000U)
+#define GPIO_MODE_EVT         ((uint32_t)0x00020000U)
+#define RISING_EDGE           ((uint32_t)0x00100000U)
+#define FALLING_EDGE          ((uint32_t)0x00200000U)
+#define GPIO_OUTPUT_TYPE      ((uint32_t)0x00000010U)
 
-#define GPIO_NUMBER           16U
+#define GPIO_NUMBER           ((uint32_t)16U)
 
 /**
   * @brief  Initializes the GPIOx peripheral according to the specified parameters in the GPIO_Init.
@@ -636,7 +637,7 @@ void HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
   for(position = 0U; position < GPIO_NUMBER; position++)
   {
     /* Get the IO position */
-    ioposition = 0x01U << position;
+    ioposition = ((uint32_t)0x01U) << position;
     /* Get the current IO position */
     iocurrent = (uint32_t)(GPIO_Init->Pin) & ioposition;
 
@@ -650,8 +651,8 @@ void HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
         assert_param(IS_GPIO_AF(GPIO_Init->Alternate));
         /* Configure Alternate function mapped with the current IO */
         temp = GPIOx->AFR[position >> 3U];
-        temp &= ~(0xFU << ((uint32_t)(position & 0x07U) * 4U)) ;
-        temp |= ((uint32_t)(GPIO_Init->Alternate) << (((uint32_t)position & 0x07U) * 4U));
+        temp &= ~((uint32_t)0xFU << ((uint32_t)(position & (uint32_t)0x07U) * 4U)) ;
+        temp |= ((uint32_t)(GPIO_Init->Alternate) << (((uint32_t)position & (uint32_t)0x07U) * 4U));
         GPIOx->AFR[position >> 3U] = temp;
       }
 
@@ -694,7 +695,7 @@ void HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
         __HAL_RCC_SYSCFG_CLK_ENABLE();
 
         temp = SYSCFG->EXTICR[position >> 2U];
-        temp &= ~(0x0FU << (4U * (position & 0x03U)));
+        temp &= ~(((uint32_t)0x0FU) << (4U * (position & 0x03U)));
         temp |= ((uint32_t)(GPIO_GET_INDEX(GPIOx)) << (4U * (position & 0x03U)));
         SYSCFG->EXTICR[position >> 2U] = temp;
 
@@ -954,7 +955,7 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
   /* Check that a Tx process is not already ongoing */
   if(huart->gState == HAL_UART_STATE_READY)
   {
-    if((pData == NULL ) || (Size == 0))
+    if((pData == NULL ) || (Size == 0U))
     {
       return  HAL_ERROR;
     }
@@ -980,7 +981,7 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
           return HAL_TIMEOUT;
         }
         tmp = (uint16_t*) pData;
-        huart->Instance->DR = (*tmp & (uint16_t)0x01FF);
+        huart->Instance->DR = (*tmp & (uint16_t)0x01FFU);
         if(huart->Init.Parity == UART_PARITY_NONE)
         {
           pData +=2U;
@@ -996,7 +997,7 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         {
           return HAL_TIMEOUT;
         }
-        huart->Instance->DR = (*pData++ & (uint8_t)0xFF);
+        huart->Instance->DR = (*pData++ & (uint8_t)0xFFU);
       }
     }
 
@@ -1038,7 +1039,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
   /* Check that a Rx process is not already ongoing */
   if(huart->RxState == HAL_UART_STATE_READY)
   {
-    if((pData == NULL ) || (Size == 0))
+    if((pData == NULL ) || (Size == 0U))
     {
       return  HAL_ERROR;
     }
@@ -1068,12 +1069,12 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
         tmp = (uint16_t*) pData;
         if(huart->Init.Parity == UART_PARITY_NONE)
         {
-          *tmp = (uint16_t)(huart->Instance->DR & (uint16_t)0x01FF);
+          *tmp = (uint16_t)(huart->Instance->DR & (uint16_t)0x01FFU);
           pData +=2U;
         }
         else
         {
-          *tmp = (uint16_t)(huart->Instance->DR & (uint16_t)0x00FF);
+          *tmp = (uint16_t)(huart->Instance->DR & (uint16_t)0x00FFU);
           pData +=1U;
         }
 
@@ -1086,11 +1087,11 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
         }
         if(huart->Init.Parity == UART_PARITY_NONE)
         {
-          *pData++ = (uint8_t)(huart->Instance->DR & (uint8_t)0x00FF);
+          *pData++ = (uint8_t)(huart->Instance->DR & (uint8_t)0x00FFU);
         }
         else
         {
-          *pData++ = (uint8_t)(huart->Instance->DR & (uint8_t)0x007F);
+          *pData++ = (uint8_t)(huart->Instance->DR & (uint8_t)0x007FU);
         }
 
       }
@@ -1115,7 +1116,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
 
 ///**
   //* @brief  Fills each CRYP_KeyInitStruct member with its default value.
-  //* @param  CRYP_KeyInitStruct: pointer to a CRYP_KeyInitTypeDef structure 
+  //* @param  CRYP_KeyInitStruct: pointer to a CRYP_KeyInitTypeDef structure
   //*         which will be initialized.
   //* @retval None
   //*/
@@ -1132,9 +1133,9 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
 //}
 
 ///**
-  //* @brief  Flushes the IN and OUT FIFOs (that is read and write pointers of the 
+  //* @brief  Flushes the IN and OUT FIFOs (that is read and write pointers of the
   //*         FIFOs are reset)
-  //* @note   The FIFOs must be flushed only when BUSY flag is reset.  
+  //* @note   The FIFOs must be flushed only when BUSY flag is reset.
   //* @param  None
   //* @retval None
   //*/
@@ -1158,11 +1159,11 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
   //assert_param(IS_CRYP_DATATYPE(CRYP_InitStruct->CRYP_DataType));
   //assert_param(IS_CRYP_ALGODIR(CRYP_InitStruct->CRYP_AlgoDir));
 
-  ///* Select Algorithm mode*/  
+  ///* Select Algorithm mode*/
   //CRYP->CR &= ~CRYP_CR_ALGOMODE;
   //CRYP->CR |= CRYP_InitStruct->CRYP_AlgoMode;
 
-  ///* Select dataType */ 
+  ///* Select dataType */
   //CRYP->CR &= ~CRYP_CR_DATATYPE;
   //CRYP->CR |= CRYP_InitStruct->CRYP_DataType;
 
@@ -1174,12 +1175,12 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
   //{
     //assert_param(IS_CRYP_KEYSIZE(CRYP_InitStruct->CRYP_KeySize));
     //CRYP->CR &= ~CRYP_CR_KEYSIZE;
-    //CRYP->CR |= CRYP_InitStruct->CRYP_KeySize; /* Key size and value must be 
-                                                  //configured once the key has 
+    //CRYP->CR |= CRYP_InitStruct->CRYP_KeySize; /* Key size and value must be
+                                                  //configured once the key has
                                                   //been prepared */
   //}
 
-  ///* Select data Direction */ 
+  ///* Select data Direction */
   //CRYP->CR &= ~CRYP_CR_ALGODIR;
   //CRYP->CR |= CRYP_InitStruct->CRYP_AlgoDir;
 //}
@@ -1251,8 +1252,8 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
 
 ///**
   //* @brief  Writes data in the Data Input register (DIN).
-  //* @note   After the DIN register has been read once or several times, 
-  //*         the FIFO must be flushed (using CRYP_FIFOFlush() function).  
+  //* @note   After the DIN register has been read once or several times,
+  //*         the FIFO must be flushed (using CRYP_FIFOFlush() function).
   //* @param  Data: data to write in Data Input register
   //* @retval None
   //*/
@@ -1293,7 +1294,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
   //assert_param(IS_CRYP_GET_FLAG(CRYP_FLAG));
 
   ///* check if the FLAG is in RISR register */
-  //if ((CRYP_FLAG & FLAG_MASK) != 0x00) 
+  //if ((CRYP_FLAG & FLAG_MASK) != 0x00)
   //{
     //tempreg = CRYP->RISR;
   //}
@@ -1400,7 +1401,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
     //default:
     //break;
   //}
-  
+
   ///*------------------ AES Decryption ------------------*/
   //if(Mode == MODE_DECRYPT) /* AES decryption */
   //{
@@ -1432,7 +1433,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
     //}
     //else
     //{
-      ///* Crypto Init for decryption process */  
+      ///* Crypto Init for decryption process */
       //AES_CRYP_InitStructure.CRYP_AlgoDir = CRYP_AlgoDir_Decrypt;
     //}
   //}
@@ -1458,11 +1459,11 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
 
   //if(CRYP_GetCmdStatus() == DISABLE)
   //{
-    ///* The CRYP peripheral clock is not enabled or the device doesn't embed 
+    ///* The CRYP peripheral clock is not enabled or the device doesn't embed
        //the CRYP peripheral (please check the device sales type. */
     //return(ERROR);
   //}
-  
+
   //for(i=0; ((i<Ilength) && (status != ERROR)); i+=16)
   //{
 
@@ -1498,7 +1499,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
       //outputaddr+=4;
       //*(uint32_t*)(outputaddr) = CRYP_DataOut();
       //outputaddr+=4;
-      //*(uint32_t*)(outputaddr) = CRYP_DataOut(); 
+      //*(uint32_t*)(outputaddr) = CRYP_DataOut();
       //outputaddr+=4;
     //}
   //}
@@ -1506,11 +1507,11 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
   ///* Disable Crypto */
   //CRYP_Cmd(DISABLE);
 
-  //return status; 
+  //return status;
 //}
 
 /**
-  * @brief  Writes the Key in Key registers. 
+  * @brief  Writes the Key in Key registers.
   * @param  hcryp pointer to a CRYP_HandleTypeDef structure that contains
   *         the configuration information for CRYP module
   * @param  Key Pointer to Key buffer
@@ -1520,7 +1521,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
 static void CRYP_SetKey(CRYP_HandleTypeDef *hcryp, uint8_t *Key, uint32_t KeySize)
 {
   uint32_t keyaddr = (uint32_t)Key;
-  
+
   switch(KeySize)
   {
   case CRYP_KEYSIZE_256B:
@@ -1554,7 +1555,7 @@ static void CRYP_SetKey(CRYP_HandleTypeDef *hcryp, uint8_t *Key, uint32_t KeySiz
     keyaddr+=4U;
     hcryp->Instance->K3RR = __REV(*(uint32_t*)(keyaddr));
     break;
-  case CRYP_KEYSIZE_128B:       
+  case CRYP_KEYSIZE_128B:
     hcryp->Instance->K2LR = __REV(*(uint32_t*)(keyaddr));
     keyaddr+=4U;
     hcryp->Instance->K2RR = __REV(*(uint32_t*)(keyaddr));
@@ -1583,11 +1584,11 @@ static HAL_StatusTypeDef CRYP_ProcessData(CRYP_HandleTypeDef *hcryp, uint8_t* In
 static HAL_StatusTypeDef CRYP_ProcessData(CRYP_HandleTypeDef *hcryp, uint8_t* Input, uint16_t Ilength, uint8_t* Output, uint32_t Timeout)
 {
   uint32_t tickstart = 0U;
-  
+
   uint32_t i = 0U;
   uint32_t inputaddr  = (uint32_t)Input;
   uint32_t outputaddr = (uint32_t)Output;
-  
+
   for(i=0U; (i < Ilength); i+=16U)
   {
     /* Write the Input block in the IN FIFO */
@@ -1599,12 +1600,12 @@ static HAL_StatusTypeDef CRYP_ProcessData(CRYP_HandleTypeDef *hcryp, uint8_t* In
     inputaddr+=4U;
     hcryp->Instance->DR = *(uint32_t*)(inputaddr);
     inputaddr+=4U;
-    
+
     /* Get tick */
     tickstart = HAL_GetTick();
 
     while(HAL_IS_BIT_CLR(hcryp->Instance->SR, CRYP_FLAG_OFNE))
-    {    
+    {
       /* Check for the Timeout */
       if(Timeout != HAL_MAX_DELAY)
       {
@@ -1612,10 +1613,10 @@ static HAL_StatusTypeDef CRYP_ProcessData(CRYP_HandleTypeDef *hcryp, uint8_t* In
         {
           /* Change state */
           hcryp->State = HAL_CRYP_STATE_TIMEOUT;
-          
+
           /* Process Unlocked */
           __HAL_UNLOCK(hcryp);
-        
+
           return HAL_TIMEOUT;
         }
       }
@@ -1635,7 +1636,7 @@ static HAL_StatusTypeDef CRYP_ProcessData(CRYP_HandleTypeDef *hcryp, uint8_t* In
 }
 
 HAL_StatusTypeDef HAL_CRYP_Init(CRYP_HandleTypeDef *hcryp)
-{ 
+{
   /* Check the CRYP handle allocation */
   if(hcryp == NULL)
   {
@@ -1645,7 +1646,7 @@ HAL_StatusTypeDef HAL_CRYP_Init(CRYP_HandleTypeDef *hcryp)
   /* Check the parameters */
   assert_param(IS_CRYP_KEYSIZE(hcryp->Init.KeySize));
   assert_param(IS_CRYP_DATATYPE(hcryp->Init.DataType));
-    
+
   if(hcryp->State == HAL_CRYP_STATE_RESET)
   {
     /* Allocate lock resource and initialize it */
@@ -1653,29 +1654,29 @@ HAL_StatusTypeDef HAL_CRYP_Init(CRYP_HandleTypeDef *hcryp)
     /* Init the low level hardware */
     //HAL_CRYP_MspInit(hcryp);
   }
-  
+
   /* Change the CRYP state */
   hcryp->State = HAL_CRYP_STATE_BUSY;
-  
+
   /* Set the key size and data type*/
   CRYP->CR = (uint32_t) (hcryp->Init.KeySize | hcryp->Init.DataType);
-  
+
   /* Reset CrypInCount and CrypOutCount */
   hcryp->CrypInCount = 0U;
   hcryp->CrypOutCount = 0U;
-  
+
   /* Change the CRYP state */
   hcryp->State = HAL_CRYP_STATE_READY;
-  
+
   /* Set the default CRYP phase */
   hcryp->Phase = HAL_CRYP_PHASE_READY;
-  
+
   /* Return function status */
   return HAL_OK;
 }
 
 /**
-  * @brief  DeInitializes the CRYP peripheral. 
+  * @brief  DeInitializes the CRYP peripheral.
   * @param  hcryp pointer to a CRYP_HandleTypeDef structure that contains
   *         the configuration information for CRYP module
   * @retval HAL status
@@ -1687,23 +1688,23 @@ HAL_StatusTypeDef HAL_CRYP_DeInit(CRYP_HandleTypeDef *hcryp)
   {
     return HAL_ERROR;
   }
-  
+
   /* Change the CRYP state */
   hcryp->State = HAL_CRYP_STATE_BUSY;
-  
+
   /* Set the default CRYP phase */
   hcryp->Phase = HAL_CRYP_PHASE_READY;
-  
+
   /* Reset CrypInCount and CrypOutCount */
   hcryp->CrypInCount = 0U;
   hcryp->CrypOutCount = 0U;
-  
+
   /* Disable the CRYP Peripheral Clock */
   __HAL_CRYP_DISABLE(hcryp);
-  
+
   /* DeInit the low level hardware: CLOCK, NVIC.*/
   //HAL_CRYP_MspDeInit(hcryp);
-  
+
   /* Change the CRYP state */
   hcryp->State = HAL_CRYP_STATE_RESET;
 
@@ -1718,41 +1719,41 @@ HAL_StatusTypeDef HAL_CRYP_AESECB_Encrypt(CRYP_HandleTypeDef *hcryp, uint8_t *pP
 {
   /* Process Locked */
   __HAL_LOCK(hcryp);
-  
+
   /* Change the CRYP state */
   hcryp->State = HAL_CRYP_STATE_BUSY;
-  
+
   /* Check if initialization phase has already been performed */
   if(hcryp->Phase == HAL_CRYP_PHASE_READY)
   {
     /* Set the key */
     CRYP_SetKey(hcryp, hcryp->Init.pKey, hcryp->Init.KeySize);
-    
+
     /* Set the CRYP peripheral in AES ECB mode */
     __HAL_CRYP_SET_MODE(hcryp, CRYP_CR_ALGOMODE_AES_ECB);
-    
+
     /* Flush FIFO */
     __HAL_CRYP_FIFO_FLUSH(hcryp);
-    
+
     /* Enable CRYP */
     __HAL_CRYP_ENABLE(hcryp);
-    
+
     /* Set the phase */
     hcryp->Phase = HAL_CRYP_PHASE_PROCESS;
   }
-  
+
     /* Write Plain Data and Get Cypher Data */
     if(CRYP_ProcessData(hcryp, pPlainData, Size, pCypherData, Timeout) != HAL_OK)
     {
       return HAL_TIMEOUT;
     }
-  
+
   /* Change the CRYP state */
   hcryp->State = HAL_CRYP_STATE_READY;
-  
+
   /* Process Unlocked */
   __HAL_UNLOCK(hcryp);
-  
+
   /* Return function status */
   return HAL_OK;
 }
@@ -1765,32 +1766,32 @@ HAL_StatusTypeDef HAL_CRYP_AESECB_Encrypt(CRYP_HandleTypeDef *hcryp, uint8_t *pP
   * @param  pCypherData Pointer to the cyphertext buffer
   * @param  Size Length of the plaintext buffer, must be a multiple of 16.
   * @param  pPlainData Pointer to the plaintext buffer
-  * @param  Timeout Specify Timeout value  
+  * @param  Timeout Specify Timeout value
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_CRYP_AESECB_Decrypt(CRYP_HandleTypeDef *hcryp, uint8_t *pCypherData, uint16_t Size, uint8_t *pPlainData, uint32_t Timeout)
 {
    uint32_t tickstart = 0U;
-  
+
   /* Process Locked */
   __HAL_LOCK(hcryp);
-  
+
   /* Change the CRYP state */
   hcryp->State = HAL_CRYP_STATE_BUSY;
-  
+
   /* Check if initialization phase has already been performed */
   if(hcryp->Phase == HAL_CRYP_PHASE_READY)
   {
     /* Set the key */
     CRYP_SetKey(hcryp, hcryp->Init.pKey, hcryp->Init.KeySize);
-    
+
     /* Set the CRYP peripheral in AES Key mode */
     __HAL_CRYP_SET_MODE(hcryp, CRYP_CR_ALGOMODE_AES_KEY | CRYP_CR_ALGODIR);
-    
+
     /* Enable CRYP */
     __HAL_CRYP_ENABLE(hcryp);
-    
-    /* Get tick */ 
+
+    /* Get tick */
     tickstart = HAL_GetTick();
 
     while(HAL_IS_BIT_SET(hcryp->Instance->SR, CRYP_FLAG_BUSY))
@@ -1802,45 +1803,45 @@ HAL_StatusTypeDef HAL_CRYP_AESECB_Decrypt(CRYP_HandleTypeDef *hcryp, uint8_t *pC
         {
           /* Change state */
           hcryp->State = HAL_CRYP_STATE_TIMEOUT;
-          
-          /* Process Unlocked */          
+
+          /* Process Unlocked */
           __HAL_UNLOCK(hcryp);
-        
+
           return HAL_TIMEOUT;
         }
       }
     }
-    
+
     /* Disable CRYP */
     __HAL_CRYP_DISABLE(hcryp);
-    
+
     /* Reset the ALGOMODE bits*/
     CRYP->CR &= (uint32_t)(~CRYP_CR_ALGOMODE);
-    
+
     /* Set the CRYP peripheral in AES ECB decryption mode */
     __HAL_CRYP_SET_MODE(hcryp, CRYP_CR_ALGOMODE_AES_ECB | CRYP_CR_ALGODIR);
     /* Flush FIFO */
     __HAL_CRYP_FIFO_FLUSH(hcryp);
-    
+
     /* Enable CRYP */
     __HAL_CRYP_ENABLE(hcryp);
-    
+
     /* Set the phase */
     hcryp->Phase = HAL_CRYP_PHASE_PROCESS;
   }
-    
+
     /* Write Plain Data and Get Cypher Data */
     if(CRYP_ProcessData(hcryp, pCypherData, Size, pPlainData, Timeout) != HAL_OK)
     {
       return HAL_TIMEOUT;
     }
-  
+
   /* Change the CRYP state */
   hcryp->State = HAL_CRYP_STATE_READY;
-  
+
   /* Process Unlocked */
   __HAL_UNLOCK(hcryp);
-  
+
   /* Return function status */
   return HAL_OK;
 }

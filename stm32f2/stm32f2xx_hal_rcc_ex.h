@@ -395,7 +395,7 @@ void HAL_RCCEx_GetPeriphCLKConfig(RCC_PeriphCLKInitTypeDef  *PeriphClkInit);
   * @brief RCC registers bit address in the alias region
   * @{
   */
-#define PLL_TIMEOUT_VALUE          ((uint32_t)100)  /* 100 ms */
+#define PLL_TIMEOUT_VALUE          ((uint32_t)1E6 * 2U)  /* 2 ms */
 /**
   * @}
   */

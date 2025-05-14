@@ -4,9 +4,13 @@
 //You probably don't need this from rest of code
 //#include "stm32f2_hal_lowlevel.h"
 
+#include <stdint.h>
+
 void init_uart(void);
 void putch(char c);
 char getch(void);
+
+uint32_t get_rand(void);
 
 void trigger_setup(void);
 void trigger_low(void);
